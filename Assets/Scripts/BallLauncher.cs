@@ -12,11 +12,7 @@ public class BallLauncher : MonoBehaviour
     private Ball ballPrefab;
 
     [SerializeField]
-    private Text ballsCount, ballsRedyCount;
-
-    [SerializeField]
     private Image speedUpButton, ballsReturnButton;
-    private Text speedUpButtonText;
 
     private GameObject startDragPositionShow;
     private LaunchPreview launchPreview;
@@ -27,40 +23,46 @@ public class BallLauncher : MonoBehaviour
     private Vector3 endDragPosition;
 
     private int ballsReady;
+    private int ballsLaunched;
     private WaitForSeconds waitForLaunchBall = new WaitForSeconds(0.05f);
-    private bool ballsLaunched = true;
-    private bool ballsReturned = true;
-    private bool dragged = true;
+    private bool isBallsLaunched = true;
+    private bool isBallsReturned = true;
+    private bool isDragged = true;
     private bool isSpeedUp;
     private Quaternion defaultRotation;
 
     internal void ReturnBall()
     {
         ballsReady++;
-        ballsRedyCount.text = ballsReady.ToString();
-        ballsCount.text = balls.Count.ToString();
-        if (ballsLaunched && BallsReturn.needSavePosition == false)
+
+        if (isBallsLaunched && BallsReturn.needSavePosition == false)
         {
             transform.position = BallsReturn.ballPosition;
         }
-        if (ballsReady == balls.Count)
+        if (ballsReady == ballsLaunched)
         {
             StopAllCoroutines();
+            ballsLaunched = 0;
             ballsReturnButton.gameObject.SetActive(false);
             blockSpawner.SpawnRowOfBlocks();
-            transform.position = BallsReturn.ballPosition;
 
-            ballsReturned = true;
+            isBallsReturned = true;
             BallsReturn.needSavePosition = true;
         }
     }
 
     public void ReturnBalls()
     {
+        StopAllCoroutines();
+        isBallsLaunched = true;
+        transform.rotation = defaultRotation;
+        transform.position = BallsReturn.ballPosition;
         foreach (Ball ball in balls)
         {
             if (ball.isActive)
                 ball.GetComponent<Rigidbody2D>().velocity = transform.position - ball.transform.position + Vector3.down;
+            else
+                ball.endPosition = transform.position;
         }
     }
 
@@ -69,13 +71,11 @@ public class BallLauncher : MonoBehaviour
         if (isSpeedUp)
         {
             Time.timeScale = 1f;
-            speedUpButtonText.gameObject.SetActive(false);
             speedUpButton.color = Color.green;
         }
         else
         {
-            speedUpButtonText.gameObject.SetActive(true);
-            Time.timeScale = 2f;
+            Time.timeScale = 10f;
             speedUpButton.color = Color.red;
         }
 
@@ -87,6 +87,7 @@ public class BallLauncher : MonoBehaviour
         Ball ball = Instantiate(ballPrefab, transform.position, Quaternion.identity);
         ball.isActive = false;
         balls.Add(ball);
+        
     }
 
     private void Awake()
@@ -101,15 +102,14 @@ public class BallLauncher : MonoBehaviour
 
         ballsReturnButton.gameObject.SetActive(false);
 
-        speedUpButtonText = speedUpButton.GetComponentInChildren<Text>();
-        speedUpButtonText.gameObject.SetActive(false);
+        ballsLaunched = 0;
     }
 
 
 
     private void Update()
     {
-        if (ballsReturned)
+        if (isBallsReturned)
         {
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition) + Vector3.back * -10f;
 
@@ -134,7 +134,8 @@ public class BallLauncher : MonoBehaviour
         startDragPositionShow.SetActive(false);
 
         StartCoroutine(LaunchBalls());
-        dragged = true;
+        isDragged = true;
+        
     }
 
     private IEnumerator SetActive(GameObject gameObject, float seconds)
@@ -149,28 +150,31 @@ public class BallLauncher : MonoBehaviour
         Vector3 direction = startDragPosition - endDragPosition;
         if (CanLaunch(direction))
         {
+            if (Vector3.Angle(direction, Vector3.up) > 80)
+            {
+                direction.x /= Mathf.Abs(direction.x);
+                direction.y = 0.15f;
+            }
 
-            ballsLaunched = false;
-            ballsReturned = false;
+            isBallsLaunched = false;
+            isBallsReturned = false;
             direction.Normalize();
             CreateBall();
 
             ballsReady = 0;
-            ballsRedyCount.text = ballsReady.ToString();
-
+            StartCoroutine(SetActive(ballsReturnButton.gameObject, 3f));
             foreach (var ball in balls)
             {
                 ball.transform.position = transform.position;
                 ball.isActive = true;
                 ball.GetComponent<Rigidbody2D>().AddForce(direction);
 
+                ballsLaunched++;
+
                 yield return waitForLaunchBall;
             }
-            ballsLaunched = true;
-
+            isBallsLaunched = true;
             transform.rotation = defaultRotation;
-            StartCoroutine(SetActive(ballsReturnButton.gameObject, 3f));
-
         }
         else transform.rotation = defaultRotation;
 
@@ -185,6 +189,12 @@ public class BallLauncher : MonoBehaviour
 
         if (CanLaunch(direction))
         {
+            if (Vector3.Angle(direction, Vector3.up) > 80)
+            {
+                direction.x /= Mathf.Abs(direction.x);
+                direction.y = 0.15f;
+            }
+
             direction.Normalize();
             launchPreview.SetEndPoint(direction);
         }
@@ -196,7 +206,7 @@ public class BallLauncher : MonoBehaviour
 
     private void StartDrag(Vector3 worldPosition)
     {
-        dragged = false;
+        isDragged = false;
         startDragPositionShow.SetActive(true);
         startDragPositionShow.transform.position = worldPosition;
 
@@ -207,8 +217,9 @@ public class BallLauncher : MonoBehaviour
     private bool CanLaunch(Vector3 direction)
     {
         float angle = Vector3.Angle(direction, Vector3.up);
-        bool correctLength = direction.magnitude > 1f;
-        bool correctAngle = angle < 83;
-        return correctAngle && correctLength && ballsReturned && dragged == false;
+        bool isCorrectLength = direction.magnitude > 1f;
+        bool isCorrectAngle = angle < 120;
+        
+        return isCorrectAngle && isCorrectLength && isBallsReturned && isDragged == false;
     }
 }
