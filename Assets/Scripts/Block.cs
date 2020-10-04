@@ -34,6 +34,8 @@ public class Block : MonoBehaviour
         }
         else
         {
+            GameController.instance.CheckWin();
+            GameController.instance.PlayBlockDestroyedEffect(transform.position);
             Destroy(gameObject);
         }
     }

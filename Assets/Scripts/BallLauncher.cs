@@ -21,6 +21,7 @@ public class BallLauncher : MonoBehaviour
 
     private Vector3 startDragPosition;
     private Vector3 endDragPosition;
+    private Vector2 originLoseCheck = new Vector2(-2.8f, -3.5f);
 
     private int ballsReady;
     private int ballsLaunched;
@@ -90,6 +91,25 @@ public class BallLauncher : MonoBehaviour
         
     }
 
+    public void SetBalls(int count)
+    {
+        if (balls.Count < count)
+        {
+            for (int i = 0; i < count - balls.Count; i++)
+            {
+                CreateBall();
+            }
+        }
+        else 
+        {
+            foreach (Ball ball in balls.GetRange(0, balls.Count - count))
+            {
+                Destroy(ball.gameObject);
+            }
+            balls.RemoveRange(0, balls.Count - count);
+        }
+    }
+
     private void Awake()
     {
         launchPreview = GetComponent<LaunchPreview>();
@@ -104,8 +124,6 @@ public class BallLauncher : MonoBehaviour
 
         ballsLaunched = 0;
     }
-
-
 
     private void Update()
     {

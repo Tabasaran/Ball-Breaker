@@ -16,8 +16,6 @@ public class BallsReturn : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        
-        
         if (collision.gameObject.CompareTag("Ball"))
         {
             if (needSavePosition)
@@ -31,4 +29,5 @@ public class BallsReturn : MonoBehaviour
             ball.endPosition = ballPosition;
         }
     }
+
 }

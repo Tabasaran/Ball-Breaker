@@ -11,7 +11,11 @@ public class BlockSpawner : MonoBehaviour
     private int playWidth = 7;
     private float distanceBetweenBlock = 0.8f;
     private int rowsSpawned = 1;
-
+    public int RowsSpawned
+    {
+        set { rowsSpawned = value; }
+        get { return rowsSpawned; }
+    }
 
     [SerializeField]
     private Text lvlCountText;
@@ -23,15 +27,65 @@ public class BlockSpawner : MonoBehaviour
         SpawnRowOfBlocks();
     }
 
-    internal void SpawnRowOfBlocks()
+    public IEnumerator CheckWin()
     {
-        lvlCountText.text = rowsSpawned.ToString();
+        yield return new WaitForSeconds(0.05f);
+
+        bool win = true;
         foreach (Block block in blocksSpawned)
         {
             if (block != null)
             {
-                block.transform.position += Vector3.down * distanceBetweenBlock;
+                win = false;
+                break;
             }
+        }
+
+        if (win)
+        {
+            GameController.instance.SaveCheckPoint(rowsSpawned);
+        }
+    }
+
+    internal void RemoveBlocks(int checkPoint)
+    {
+        
+        foreach (Block block in blocksSpawned)
+        {
+            if (block != null)
+            {
+                Destroy(block.gameObject);
+            }
+        }
+        blocksSpawned = new List<Block>();
+        rowsSpawned = checkPoint;
+        SpawnRowOfBlocks();
+    }
+
+    internal void SpawnRowOfBlocks()
+    {
+        List<Block> tempBlocs = new List<Block>();
+        lvlCountText.text = rowsSpawned.ToString();
+        bool isLose = false;
+        foreach (Block block in blocksSpawned)
+        {
+            if (block != null)
+            {
+                tempBlocs.Add(block);
+                block.transform.position += Vector3.down * distanceBetweenBlock;
+
+                if (block.transform.position.y < -3)
+                {
+                    isLose = true;
+                }
+            }
+        }
+        blocksSpawned = tempBlocs;
+
+        if (isLose)
+        {
+            GameController.instance.Lose();
+            return;
         }
 
         for (int i = 0; i < playWidth; i++)
