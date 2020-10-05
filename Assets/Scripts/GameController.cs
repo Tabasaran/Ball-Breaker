@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -8,7 +9,14 @@ public class GameController : MonoBehaviour
     private BallLauncher ballLauncher;
     [SerializeField]
     private BlockSpawner blockSpawner;
+
+    [SerializeField]
+    private GameObject winEffect;
+    [SerializeField]
+    private Text checkpointText;
+
     public static GameController instance;
+
     private int checkPoint = 1;
     [SerializeField]
     private GameObject[] blockDestroyEffect;
@@ -27,6 +35,7 @@ public class GameController : MonoBehaviour
     {
         checkPoint = lvl;
         ballLauncher.ReturnBalls();
+        StartCoroutine(Win(lvl));
     }
     public void Lose()
     {
@@ -39,5 +48,16 @@ public class GameController : MonoBehaviour
         blockDestroyEffect[blockDestroyEffectCount % blockDestroyEffect.Length].transform.position = position;
         blockDestroyEffect[blockDestroyEffectCount % blockDestroyEffect.Length].SetActive(true);
         blockDestroyEffectCount++;
+    }
+
+    private IEnumerator Win(int lvl)
+    {
+        
+        winEffect.SetActive(true);
+        yield return new WaitForSeconds(0.2f);
+        checkpointText.text = "checkpoint\n" + lvl;
+        checkpointText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(1f);
+        checkpointText.gameObject.SetActive(false);
     }
 }
