@@ -57,7 +57,7 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         checkpointText.text = "checkpoint\n" + lvl;
         checkpointText.gameObject.SetActive(true);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSecondsRealtime(1f);
         checkpointText.gameObject.SetActive(false);
     }
 }

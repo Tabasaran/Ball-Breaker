@@ -97,6 +97,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31f1f166107a97b4c85ec9e776a03972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blockColor:
+    serializedVersion: 2
+    key0: {r: 1, g: 0.98879445, b: 0, a: 0.9019608}
+    key1: {r: 1, g: 0.6156863, b: 0, a: 0.9019608}
+    key2: {r: 1, g: 0.16017316, b: 0, a: 0}
+    key3: {r: 1, g: 0, b: 0.669528, a: 0}
+    key4: {r: 0, g: 0.3246026, b: 1, a: 0}
+    key5: {r: 0, g: 1, b: 0.8629031, a: 0}
+    key6: {r: 0.1383928, g: 1, b: 0, a: 0}
+    key7: {r: 0.1383928, g: 1, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 2621
+    ctime2: 5898
+    ctime3: 16384
+    ctime4: 32112
+    ctime5: 53083
+    ctime6: 65535
+    ctime7: 65535
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 7
+    m_NumAlphaKeys: 2
 --- !u!58 &1147136460411610307
 CircleCollider2D:
   m_ObjectHideFlags: 0

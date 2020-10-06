@@ -8,6 +8,8 @@ public class Block : MonoBehaviour
     private int hitsRemaining = 10;
     private SpriteRenderer spriteRenderer;
     private TextMeshPro text;
+    [SerializeField]
+    private Gradient blockColor;
 
     private void Awake()
     {
@@ -19,9 +21,8 @@ public class Block : MonoBehaviour
     private void UpdateVisualState()
     {
         text.SetText(hitsRemaining.ToString());
-        //Color change system
         //spriteRenderer.color = GetBlockColor(hitsRemaining);
-        spriteRenderer.color = Color.Lerp(Color.yellow, Color.red, hitsRemaining / 10f);
+        spriteRenderer.color = blockColor.Evaluate(hitsRemaining/300f);
         
     }
 

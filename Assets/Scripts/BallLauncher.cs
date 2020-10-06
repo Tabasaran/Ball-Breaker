@@ -31,6 +31,7 @@ public class BallLauncher : MonoBehaviour
     private bool isDragged = true;
     private bool isSpeedUp;
     private Quaternion defaultRotation;
+    
 
     internal void ReturnBall()
     {
@@ -76,7 +77,7 @@ public class BallLauncher : MonoBehaviour
         }
         else
         {
-            Time.timeScale = 10f;
+            Time.timeScale = 2f;
             speedUpButton.color = Color.red;
         }
 
